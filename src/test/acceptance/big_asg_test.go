@@ -58,7 +58,7 @@ var _ = Describe("Container startup time with a big ASG", func() {
 			})
 
 			By("creating a large ASG", func() {
-				asg := testsupport.BuildASG(1000)
+				asg := testsupport.BuildASG(500)
 				var err error
 				ASGFilepath, err = testsupport.CreateASGFile(asg)
 				Expect(err).NotTo(HaveOccurred())
