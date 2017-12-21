@@ -192,7 +192,7 @@ var testASGs = map[string]string{
 	"icmp-asg": `
 	[
 		{
-			"destination": "0.0.0.1-255.255.255.255",
+			"destination": "0.0.0.0-255.255.255.255",
 			"protocol": "icmp",
 			"type": 8,
 			"code": 0
