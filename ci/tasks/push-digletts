@@ -1,0 +1,24 @@
+#!/bin/bash -eu
+
+pushd deployments-repo/environments/${ENVIRONMENT_NAME}
+  cf api "api.${SYSTEM_DOMAIN}" --skip-ssl-validation
+  pw=$(grep cf_admin_password vars-store.yml | cut -d ' ' -f2)
+  cf auth admin "${pw}"
+popd > /dev/null
+
+cf create-org pokemon-org
+cf target -o pokemon-org
+cf create-space diglett-den
+cf target -o pokemon-org -s diglett-den
+
+pushd cf-app-sd/src/example-apps/diglett
+  for (( i=0; i<"${APP_COUNT}"; i++))
+  do
+    APP_NAME=diglett-$(uuidgen)
+    cf push $APP_NAME --no-start
+    DIGLETT_DESTINATION="$(cf app $APP_NAME --guid).apps.internal"
+    cf set-env $APP_NAME DIGLETT_DESTINATION $DIGLETT_DESTINATION
+    cf set-env $APP_NAME DIGLETT_FREQUENCY $DIGLETT_FREQUENCY
+    cf start $APP_NAME
+  done
+popd > /dev/null
