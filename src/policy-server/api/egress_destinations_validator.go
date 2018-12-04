@@ -20,27 +20,29 @@ func (v *EgressDestinationsValidator) ValidateEgressDestinations(destinations []
 			return errors.New("missing destination name")
 		}
 
-		if destination.Protocol == "" {
+		//TODO if one rule is invalid, don't create policy at all
+
+		if destination.Rules[0].Protocol == "" {
 			return errors.New("missing destination protocol")
 		}
 
-		if !isValidProtocol(destination.Protocol) {
-			return fmt.Errorf("invalid destination protocol '%s', specify either tcp, udp, or icmp", destination.Protocol)
+		if !isValidProtocol(destination.Rules[0].Protocol) {
+			return fmt.Errorf("invalid destination protocol '%s', specify either tcp, udp, or icmp", destination.Rules[0].Protocol)
 		}
 
-		if destination.Protocol != "icmp" && len(destination.Ports) == 0 {
+		if destination.Rules[0].Protocol != "icmp" && len(destination.Rules[0].Ports) == 0 {
 			return errors.New("missing destination ports")
 		}
 
-		if destination.Protocol == "icmp" && len(destination.Ports) > 0 {
+		if destination.Rules[0].Protocol == "icmp" && len(destination.Rules[0].Ports) > 0 {
 			return errors.New("ports are not supported for icmp protocol")
 		}
 
-		if len(destination.Ports) > 1 {
+		if len(destination.Rules[0].Ports) > 1 {
 			return errors.New("only one port range is currently supported")
 		}
 
-		for _, portRange := range destination.Ports {
+		for _, portRange := range destination.Rules[0].Ports {
 			if portRange.Start > portRange.End {
 				return fmt.Errorf("invalid port range %d-%d, start must be less than or equal to end", portRange.Start, portRange.End)
 			}
@@ -54,23 +56,23 @@ func (v *EgressDestinationsValidator) ValidateEgressDestinations(destinations []
 			}
 		}
 
-		if destination.Protocol != "icmp" && destination.ICMPCode != nil {
-			return fmt.Errorf("invalid destination: cannot set icmp_code property for destination with protocol '%s'", destination.Protocol)
+		if destination.Rules[0].Protocol != "icmp" && destination.Rules[0].ICMPCode != nil {
+			return fmt.Errorf("invalid destination: cannot set icmp_code property for destination with protocol '%s'", destination.Rules[0].Protocol)
 		}
 
-		if destination.Protocol != "icmp" && destination.ICMPType != nil {
-			return fmt.Errorf("invalid destination: cannot set icmp_type property for destination with protocol '%s'", destination.Protocol)
+		if destination.Rules[0].Protocol != "icmp" && destination.Rules[0].ICMPType != nil {
+			return fmt.Errorf("invalid destination: cannot set icmp_type property for destination with protocol '%s'", destination.Rules[0].Protocol)
 		}
 
-		if len(destination.IPRanges) == 0 {
+		if len(destination.Rules[0].IPRanges) == 0 {
 			return errors.New("missing destination IP range")
 		}
 
-		if len(destination.IPRanges) > 1 {
+		if len(destination.Rules[0].IPRanges) > 1 {
 			return errors.New("only one IP range is currently supported")
 		}
 
-		for _, ipRange := range destination.IPRanges {
+		for _, ipRange := range destination.Rules[0].IPRanges {
 			startIP := net.ParseIP(ipRange.Start)
 			if startIP == nil || startIP.To4() == nil {
 				return fmt.Errorf("invalid ip address '%s', must be a valid IPv4 address", ipRange.Start)
@@ -84,6 +86,7 @@ func (v *EgressDestinationsValidator) ValidateEgressDestinations(destinations []
 			if bytes.Compare(startIP, endIP) > 0 {
 				return fmt.Errorf("invalid IP range %s-%s, start must be less than or equal to end", ipRange.Start, ipRange.End)
 			}
+
 		}
 	}
 	return nil

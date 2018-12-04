@@ -54,6 +54,12 @@ var _ = Describe("PolicyCollectionWriter", func() {
 				Destination: store.EgressDestination{
 					Protocol: "tcp",
 					IPRanges: []store.IPRange{{Start: "8.0.8.0", End: "8.0.8.0"}},
+					Rules: []store.EgressDestinationRule{
+						{
+							Protocol: "tcp",
+							IPRanges: []store.IPRange{{Start: "8.0.8.0", End: "8.0.8.0"}},
+						},
+					},
 				},
 				AppLifecycle: "running",
 			}}
@@ -92,7 +98,13 @@ var _ = Describe("PolicyCollectionWriter", func() {
 							"source": {"id": "some-egress-app-guid", "type": "app"},
 							"destination": {
 								"ips": [{"start": "8.0.8.0", "end": "8.0.8.0"}],
-								"protocol": "tcp"
+								"protocol": "tcp",
+								"rules": [
+									{
+										"ips": [{"start": "8.0.8.0", "end": "8.0.8.0"}],
+										"protocol": "tcp"
+									}
+								]
 							},
 							"app_lifecycle": "running"
 						}

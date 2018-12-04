@@ -56,7 +56,7 @@ func mapStoreEgressPolicy(storeEgressPolicy store.EgressPolicy) EgressPolicy {
 			ID:   storeEgressPolicy.Source.ID,
 			Type: storeEgressPolicy.Source.Type,
 		},
-		Destination: &destination,
+		Destination:  &destination,
 		AppLifecycle: &storeEgressPolicy.AppLifecycle,
 	}
 }
