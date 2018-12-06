@@ -11,13 +11,11 @@ import (
 	"policy-server/psclient"
 	"strings"
 
-	"code.cloudfoundry.org/lager/lagertest"
-
 	"code.cloudfoundry.org/cf-networking-helpers/db"
 	"code.cloudfoundry.org/cf-networking-helpers/testsupport"
 	"code.cloudfoundry.org/cf-networking-helpers/testsupport/metrics"
 	"code.cloudfoundry.org/cf-networking-helpers/testsupport/ports"
-
+	"code.cloudfoundry.org/lager/lagertest"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -87,15 +85,28 @@ var _ = Describe("Internal API", func() {
 		client := psclient.NewClient(logger, http.DefaultClient, fmt.Sprintf("http://%s:%d", conf.ListenHost, conf.ListenPort))
 
 		createdDestinations, err := client.CreateDestinations("valid-token", psclient.Destination{
-			IPs:         []psclient.IPRange{{Start: "10.27.1.1", End: "10.27.1.2"}},
-			Ports:       []psclient.Port{{Start: 8080, End: 8081}},
-			Protocol:    "tcp",
+			Rules: []psclient.DestinationRule{
+				{
+					IPs:      []psclient.IPRange{{Start: "10.27.1.1", End: "10.27.1.2"}},
+					Ports:    []psclient.Port{{Start: 8080, End: 8081}},
+					Protocol: "tcp",
+				},
+			},
 			Name:        "dest-1",
 			Description: "dest-1-desc",
 		}, psclient.Destination{
-			IPs:         []psclient.IPRange{{Start: "10.27.1.3", End: "10.27.1.3"}},
-			Ports:       []psclient.Port{{Start: 8080, End: 8081}},
-			Protocol:    "tcp",
+			Rules: []psclient.DestinationRule{
+				{
+					IPs:      []psclient.IPRange{{Start: "10.27.1.3", End: "10.27.1.3"}},
+					Ports:    []psclient.Port{{Start: 8080, End: 8081}},
+					Protocol: "tcp",
+				},
+				{
+					IPs:      []psclient.IPRange{{Start: "10.27.1.4", End: "10.27.1.4"}},
+					Ports:    []psclient.Port{{Start: 80, End: 81}},
+					Protocol: "tcp",
+				},
+			},
 			Name:        "dest-2",
 			Description: "dest-2-desc",
 		})
@@ -147,11 +158,12 @@ var _ = Describe("Internal API", func() {
 		"total_egress_policies": 2,
 		"egress_policies": [
 			{ "source": { "id": "live-app-1-guid", "type": "app" }, "destination": { "id": "<replaced>", "name": "dest-1", "description": "dest-1-desc", "ips": [{"start": "10.27.1.1", "end": "10.27.1.2"}], "ports": [{"start": 8080, "end": 8081}], "protocol": "tcp" }, "app_lifecycle": "all" },
-			{ "source": { "id": "live-space-1-guid", "type": "space" }, "destination": { "id": "<replaced>", "name": "dest-2", "description": "dest-2-desc", "ips": [{"start": "10.27.1.3", "end": "10.27.1.3"}], "ports": [{"start": 8080, "end": 8081}], "protocol": "tcp" }, "app_lifecycle": "all" }
+			{ "source": { "id": "live-space-1-guid", "type": "space" }, "destination": { "id": "<replaced>", "name": "dest-2", "description": "dest-2-desc", "ips": [{"start": "10.27.1.3", "end": "10.27.1.3"}], "ports": [{"start": 8080, "end": 8081}], "protocol": "tcp" }, "app_lifecycle": "all" },
+			{ "source": { "id": "live-space-1-guid", "type": "space" }, "destination": { "id": "<replaced>", "name": "dest-2", "description": "dest-2-desc", "ips": [{"start": "10.27.1.4", "end": "10.27.1.4"}], "ports": [{"start": 80, "end": 81}], "protocol": "tcp" }, "app_lifecycle": "all" }
 		]
 	}`
 
-	DescribeTable("listing policies and tags succeeds", listPoliciesAndTagsSucceeds,
+	FDescribeTable("listing policies and tags succeeds", listPoliciesAndTagsSucceeds,
 		Entry("v1", "v1", v1ExpectedResponse),
 	)
 

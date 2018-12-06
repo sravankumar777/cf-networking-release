@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("EgressDestinationsValidator", func() {
+var _ = FDescribe("EgressDestinationsValidator", func() {
 	var validator api.EgressDestinationsValidator
 
 	BeforeEach(func() {
@@ -20,9 +20,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 				{
 					Name:        "meow",
 					Description: "a cat",
-					Protocol:    "tcp",
-					Ports:       []api.Ports{{Start: 8080, End: 8081}},
-					IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+					Rules: []api.EgressDestinationRule{
+						{
+							Protocol: "tcp",
+							Ports:    []api.Ports{{Start: 8080, End: 8081}},
+							IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+						},
+						{
+							Protocol: "udp",
+							Ports:    []api.Ports{{Start: 8080, End: 8081}},
+							IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+						},
+					},
 				},
 			}
 
@@ -43,9 +52,13 @@ var _ = Describe("EgressDestinationsValidator", func() {
 					destinations := []api.EgressDestination{
 						{
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -65,9 +78,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 							{
 								Name:        "meow",
 								Description: "a cat",
-								Protocol:    "tcp",
-								Ports:       []api.Ports{},
-								IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								Rules: []api.EgressDestinationRule{
+									{
+										Protocol: "tcp",
+										Ports:    []api.Ports{{Start: 8080, End: 8080}},
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+									},
+									{
+										Protocol: "tcp",
+										Ports:    []api.Ports{},
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+									},
+								},
 							},
 						}
 
@@ -82,8 +104,12 @@ var _ = Describe("EgressDestinationsValidator", func() {
 							{
 								Name:        "meow",
 								Description: "a cat",
-								Protocol:    "icmp",
-								IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								Rules: []api.EgressDestinationRule{
+									{
+										Protocol: "icmp",
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+									},
+								},
 							},
 						}
 
@@ -99,9 +125,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8000, End: 9000}, {Start: 8000, End: 9000}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8000, End: 9000}, {Start: 8000, End: 9000}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -116,9 +151,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8000, End: 7000}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8000, End: 7000}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -133,9 +177,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: -2, End: 7000}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: -2, End: 7000}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -151,9 +204,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8000, End: 999999}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8000, End: 999999}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -168,9 +230,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "icmp",
-							Ports:       []api.Ports{{Start: 8000, End: 9000}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "icmp",
+									Ports:    []api.Ports{{Start: 8000, End: 9000}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -187,8 +258,17 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -203,9 +283,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "meow",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "meow",
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
@@ -224,10 +313,19 @@ var _ = Describe("EgressDestinationsValidator", func() {
 							{
 								Name:        "meow",
 								Description: "a cat",
-								Protocol:    "tcp",
-								Ports:       []api.Ports{{Start: 8080, End: 8081}},
-								IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
-								ICMPType:    &icmpType,
+								Rules: []api.EgressDestinationRule{
+									{
+										Protocol: "tcp",
+										Ports:    []api.Ports{{Start: 8080, End: 8080}},
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+									},
+									{
+										Protocol: "tcp",
+										Ports:    []api.Ports{{Start: 8080, End: 8081}},
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+										ICMPType: &icmpType,
+									},
+								},
 							},
 						}
 
@@ -243,10 +341,19 @@ var _ = Describe("EgressDestinationsValidator", func() {
 							{
 								Name:        "meow",
 								Description: "a cat",
-								Protocol:    "udp",
-								Ports:       []api.Ports{{Start: 8080, End: 8081}},
-								IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
-								ICMPCode:    &icmpCode,
+								Rules: []api.EgressDestinationRule{
+									{
+										Protocol: "tcp",
+										Ports:    []api.Ports{{Start: 8080, End: 8080}},
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+									},
+									{
+										Protocol: "udp",
+										Ports:    []api.Ports{{Start: 8080, End: 8081}},
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+										ICMPCode: &icmpCode,
+									},
+								},
 							},
 						}
 
@@ -263,8 +370,12 @@ var _ = Describe("EgressDestinationsValidator", func() {
 							{
 								Name:        "meow",
 								Description: "a cat",
-								Protocol:    "icmp",
-								IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								Rules: []api.EgressDestinationRule{
+									{
+										Protocol: "icmp",
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+									},
+								},
 							},
 						}
 
@@ -282,10 +393,19 @@ var _ = Describe("EgressDestinationsValidator", func() {
 							{
 								Name:        "meow",
 								Description: "a cat",
-								Protocol:    "icmp",
-								IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
-								ICMPCode:    &icmpCode,
-								ICMPType:    &icmpType,
+								Rules: []api.EgressDestinationRule{
+									{
+										Protocol: "tcp",
+										Ports:    []api.Ports{{Start: 8080, End: 8080}},
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+									},
+									{
+										Protocol: "icmp",
+										IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+										ICMPCode: &icmpCode,
+										ICMPType: &icmpType,
+									},
+								},
 							},
 						}
 
@@ -304,9 +424,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{},
+								},
+							},
 						},
 					}
 
@@ -321,9 +450,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.10", End: "192.0.2.11"}, {Start: "192.0.2.10", End: "192.0.2.11"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.10", End: "192.0.2.11"}, {Start: "192.0.2.10", End: "192.0.2.11"}},
+								},
+							},
 						},
 					}
 
@@ -338,9 +476,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.500"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.500"}},
+								},
+							},
 						},
 					}
 
@@ -356,9 +503,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{{Start: "2001:0db8:85a3:0000:0000:8a2e:0370:7334", End: "2001:0db8:85a3:0000:0000:8a2e:0370:7334"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{{Start: "2001:0db8:85a3:0000:0000:8a2e:0370:7334", End: "2001:0db8:85a3:0000:0000:8a2e:0370:7334"}},
+								},
+							},
 						},
 					}
 
@@ -373,9 +529,18 @@ var _ = Describe("EgressDestinationsValidator", func() {
 						{
 							Name:        "meow",
 							Description: "a cat",
-							Protocol:    "tcp",
-							Ports:       []api.Ports{{Start: 8080, End: 8081}},
-							IPRanges:    []api.IPRange{{Start: "192.0.2.10", End: "192.0.2.1"}},
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8080}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.1", End: "192.0.2.1"}},
+								},
+								{
+									Protocol: "tcp",
+									Ports:    []api.Ports{{Start: 8080, End: 8081}},
+									IPRanges: []api.IPRange{{Start: "192.0.2.10", End: "192.0.2.1"}},
+								},
+							},
 						},
 					}
 
