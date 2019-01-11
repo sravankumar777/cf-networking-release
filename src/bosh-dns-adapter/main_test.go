@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"bosh-dns-adapter/fakes"
 	"crypto/tls"
 	"fmt"
 	"io"
@@ -29,6 +30,7 @@ var _ = Describe("Main", func() {
 		configFileContents                     string
 		fakeServiceDiscoveryControllerServer   *ghttp.Server
 		fakeServiceDiscoveryControllerResponse []http.HandlerFunc
+		fakeCopilotVIPResolverServer           *fakes.CopilotVIPResolverServer
 		dnsAdapterAddress                      string
 		dnsAdapterPort                         string
 		fakeMetron                             metrics.FakeMetron
@@ -56,6 +58,10 @@ var _ = Describe("Main", func() {
 					"service": ""
 				}`),
 		)}
+
+		fakeCopilotVIPResolverServer = &fakes.CopilotVIPResolverServer{}
+		fakeCopilotVIPResolverServer.Start(ports.PickAPort())
+
 		dnsAdapterAddress = "127.0.0.1"
 		internalRouteVIPRange = "127.0.0.0/24"
 
