@@ -175,7 +175,11 @@ var _ = Describe("Main", func() {
 	})
 
 	Context("when internal service mesh domain", func() {
-		It("should return a http 200 status", func() {
+		BeforeEach(func() {
+			fakeCopilotVIPResolverServer.AddHostVIPMapping("app-id.istio.local", "127.1.2.3")
+		})
+
+		FIt("should return a http 200 status", func() {
 			Eventually(session).Should(gbytes.Say("bosh-dns-adapter.server-started"))
 
 			var reader io.Reader
@@ -210,7 +214,7 @@ var _ = Describe("Main", func() {
 							"name": "app-id.istio.local.",
 							"type": 1,
 							"TTL":  0,
-							"data": "127.0.0.26"
+							"data": "127.1.2.3"
 						}
 					],
 					"Additional": [ ],
