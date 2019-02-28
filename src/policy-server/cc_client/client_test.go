@@ -4,9 +4,12 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
+	"net/url"
 	"policy-server/api"
 	"policy-server/cc_client"
 	"policy-server/cc_client/fixtures"
+	"strconv"
+	"strings"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
@@ -14,8 +17,6 @@ import (
 	"code.cloudfoundry.org/cf-networking-helpers/fakes"
 	"code.cloudfoundry.org/cf-networking-helpers/json_client"
 	"code.cloudfoundry.org/lager/lagertest"
-	"net/url"
-	"strconv"
 )
 
 var _ = Describe("Client", func() {
@@ -168,14 +169,35 @@ var _ = Describe("Client", func() {
 		Context("when there are multiple pages", func() {
 			BeforeEach(func() {
 				fakeJSONClient.DoStub = func(method, route string, reqData, respData interface{}, token string) error {
-					_ = json.Unmarshal([]byte(fixtures.AppsV3MultiplePages), respData)
+					if strings.Contains(route, "page=2") {
+						_ = json.Unmarshal([]byte(fixtures.AppsV3MultiplePagesPg2), respData)
+					} else if strings.Contains(route, "page=3") {
+						_ = json.Unmarshal([]byte(fixtures.AppsV3MultiplePagesPg3), respData)
+					} else {
+						_ = json.Unmarshal([]byte(fixtures.AppsV3MultiplePages), respData)
+					}
 					return nil
 				}
 			})
 
-			It("should immediately return an error", func() {
-				_, err := client.GetLiveAppGUIDs("some-token", []string{})
-				Expect(err).To(MatchError("pagination support not yet implemented"))
+			It("should not return an error", func() {
+				appGUIDs, err := client.GetLiveAppGUIDs("some-token", []string{})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(appGUIDs).NotTo(BeNil())
+			})
+
+			It("should return a set that contains 3 value", func() {
+				appGUIDs, err := client.GetLiveAppGUIDs("some-token", []string{})
+				Expect(err).NotTo(HaveOccurred())
+
+				Expect(len(appGUIDs)).To(Equal(3))
+
+				Expect(appGUIDs).To(Equal(map[string]struct{}{
+					"live-app-1-guid": {},
+					"live-app-2-guid": {},
+					"live-app-3-guid": {},
+				}))
 			})
 		})
 	})

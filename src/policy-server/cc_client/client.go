@@ -125,21 +125,21 @@ func (c *Client) GetLiveAppGUIDs(token string, appGUIDs []string) (map[string]st
 
 	route := fmt.Sprintf("/v3/apps?%s", values.Encode())
 
-	var response AppsV3Response
-	err := c.JSONClient.Do("GET", route, nil, &response, token)
-	if err != nil {
-		return nil, fmt.Errorf("json client do: %s", err)
-	}
-
-	if response.Pagination.TotalPages > 1 {
-		return nil, fmt.Errorf("pagination support not yet implemented")
-	}
-
 	set := make(map[string]struct{})
-	for _, r := range response.Resources {
-		set[r.GUID] = struct{}{}
-	}
 
+	for route != "" {
+		var response AppsV3Response
+		err := c.JSONClient.Do("GET", route, nil, &response, token)
+		if err != nil {
+			return nil, fmt.Errorf("json client do: %s", err)
+		}
+
+		for _, r := range response.Resources {
+			set[r.GUID] = struct{}{}
+		}
+
+		route = response.Pagination.Next.Href
+	}
 	return set, nil
 }
 
