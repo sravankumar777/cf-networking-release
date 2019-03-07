@@ -628,6 +628,48 @@ var _ = Describe("EgressDestinationsValidator", func() {
 				})
 			})
 
+			Context("when the IP is cidr", func() {
+				It("is valid", func() {
+					destinations := []api.EgressDestination{
+						{
+							Name:        "meow",
+							Description: "a cat",
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    "8080-8080",
+									IPRanges: "127.0.0.0/16",
+								},
+							},
+						},
+					}
+
+					err := validator.ValidateEgressDestinations(destinations)
+					Expect(err).To(BeNil())
+				})
+			})
+
+			Context("when an invalid cidr is passed as IP", func() {
+				It("returns an error", func() {
+					destinations := []api.EgressDestination{
+						{
+							Name:        "meow",
+							Description: "a cat",
+							Rules: []api.EgressDestinationRule{
+								{
+									Protocol: "tcp",
+									Ports:    "8080-8080",
+									IPRanges: "127.0.0.0/10000",
+								},
+							},
+						},
+					}
+
+					err := validator.ValidateEgressDestinations(destinations)
+					Expect(err).To(MatchError("invalid cidr address '127.0.0.0/10000' passed"))
+				})
+			})
+
 			Context("when the End IP is greater than the Start IP ", func() {
 				It("returns an error", func() {
 					destinations := []api.EgressDestination{

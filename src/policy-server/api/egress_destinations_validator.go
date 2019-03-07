@@ -89,6 +89,14 @@ func (v *EgressDestinationsValidator) ValidateEgressDestinations(destinations []
 				return errors.New("only one IP range is currently supported")
 			}
 
+			if _, _, err := net.ParseCIDR(rule.IPRanges); err == nil {
+				return nil
+			}
+
+			if _, _, err := net.ParseCIDR(rule.IPRanges); err != nil && !strings.Contains(rule.IPRanges, "-") {
+				return fmt.Errorf("invalid cidr address '%s' passed", rule.IPRanges)
+			}
+
 			splitIPS := strings.Split(rule.IPRanges, "-")
 			startIPString, endIPString := splitIPS[0], splitIPS[1]
 			startIP := net.ParseIP(startIPString)
