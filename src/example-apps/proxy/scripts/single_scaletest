@@ -26,8 +26,8 @@ countFailures=0
 for i in $(seq 1 ${numApps}); do
   curl "external.chicago.routing.cf-app.com/proxy/internal$i.istio.apps.internal:8080" | grep "ListenAddress"
   exitcode=$?
-  if [ exitcode != 0 ]; then
-    countFailures=$countFailures+1
+  if [ $exitcode -ne 0 ]; then
+    countFailures=$((countFailures+1))
   fi
   # wrap this to only print to file when there's an error\
   echo "***********************************"

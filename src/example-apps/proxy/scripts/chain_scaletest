@@ -1,6 +1,5 @@
 #!/bin/bash
-
-# This is the chain scale test where each app is connected to one other app
+# chain scaletest connects each app to one other app
 # Usage scale_test ARG1
 # where ARG1 is number of Apps to push which defaults to 5
 
@@ -21,18 +20,24 @@ for i in $(seq 1 ${numApps}); do
   sleep 2
   cf add-network-policy external --destination-app "internal$i"
 done
-
 sleep 90
 
-#curl external/proxy/p1 
+countFailures=0
 for i in $(seq 1 ${numApps}); do
   curl "external.chicago.routing.cf-app.com/proxy/internal$i.istio.apps.internal:8080" | grep "ListenAddress"
   exitcode=$?
+  if [ $exitcode -ne 0 ]; then
+    countFailures=$((countFailures+1))
+  fi
   # wrap this to only print to file when there's an error\
   echo "***********************************"
   echo "status code: $exitcode for curling internal$i"
   echo "***********************************"
 done
+
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Total Failures: $countFailures"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 
 
 
