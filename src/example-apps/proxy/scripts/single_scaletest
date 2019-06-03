@@ -1,0 +1,44 @@
+#!/bin/bash
+# single scaletest connects one external app to numApps other internal apps
+# Usage scale_test ARG1
+# where ARG1 is number of Apps to push which defaults to 5
+
+
+if [ "$1" == "" ]; then
+  numApps=5
+else
+  numApps="$1"
+fi
+
+echo $numApps
+
+cf push external
+
+for i in $(seq 1 ${numApps}); do
+  echo "$i"
+  cf push "internal$i" -d istio.apps.internal
+  sleep 2
+  cf add-network-policy external --destination-app "internal$i"
+done
+sleep 90
+
+countFailures=0
+for i in $(seq 1 ${numApps}); do
+  curl "external.chicago.routing.cf-app.com/proxy/internal$i.istio.apps.internal:8080" | grep "ListenAddress"
+  exitcode=$?
+  if [ exitcode != 0 ]; then
+    countFailures=$countFailures+1
+  fi
+  # wrap this to only print to file when there's an error\
+  echo "***********************************"
+  echo "status code: $exitcode for curling internal$i"
+  echo "***********************************"
+done
+
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+echo "Total Failures: $countFailures"
+echo "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
+
+
+
