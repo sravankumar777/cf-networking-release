@@ -12,10 +12,16 @@ fi
 
 echo $numApps
 
-cf push external
+# cf push external
+
+sourceDropletGuid=$(cf curl /v3/apps/$(cf app "internal1" --guid)/droplets | jq -r .resources[0].guid)
 
 for i in $(seq 1 ${numApps}); do
   echo "$i"
+  cf v3-create-app "internal$i"
+  appGuid=$(cf app "internal$i" --guid)
+  postData="{'relationships': { 'app': { 'data': { 'guid': '$appGuid' } } } }"
+  cf curl /v3/droplets?source_guid=$sourceDropletGuid -X POST -d "$postData"
   cf push "internal$i" -d istio.apps.internal
   sleep 2
   cf add-network-policy external --destination-app "internal$i"
