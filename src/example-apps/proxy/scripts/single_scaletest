@@ -12,19 +12,26 @@ fi
 
 echo $numApps
 
-# cf push external
+cf push external
 
 sourceDropletGuid=$(cf curl /v3/apps/$(cf app "internal1" --guid)/droplets | jq -r .resources[0].guid)
 
-for i in $(seq 1 ${numApps}); do
+for i in $(seq 200 ${numApps}); do
   echo "$i"
   cf v3-create-app "internal$i"
   appGuid=$(cf app "internal$i" --guid)
-  postData="{'relationships': { 'app': { 'data': { 'guid': '$appGuid' } } } }"
-  cf curl /v3/droplets?source_guid=$sourceDropletGuid -X POST -d "$postData"
-  cf push "internal$i" -d istio.apps.internal
-  sleep 2
+  postData="{\"relationships\": { \"app\": { \"data\": { \"guid\": \"$appGuid\" } } } }"
+  copiedDropletGuid=$(cf curl /v3/droplets?source_guid=$sourceDropletGuid -X POST -d "$postData" | jq -r .guid)
+
+  while ! $(cf v3-droplets "internal$i" | grep -q staged); do
+    echo waiting for droplet to be staged...
+    sleep 1
+  done
+
+  cf v3-set-droplet "internal$i" --droplet-guid $copiedDropletGuid
   cf add-network-policy external --destination-app "internal$i"
+  cf map-route "internal$i" istio.apps.internal -n "internal$i"
+  cf v3-scale "internal$i" -k 32M -m 32M -f #this starts the app too.
 done
 sleep 90
 
@@ -33,6 +40,7 @@ for i in $(seq 1 ${numApps}); do
   curl "external.chicago.routing.cf-app.com/proxy/internal$i.istio.apps.internal:8080" | grep "ListenAddress"
   exitcode=$?
   if [ $exitcode -ne 0 ]; then
+    echo "RRRRRRRRRRRRRRR FAILURE APP: $i"
     countFailures=$((countFailures+1))
   fi
   # wrap this to only print to file when there's an error\
