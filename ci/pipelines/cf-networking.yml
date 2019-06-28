@@ -910,14 +910,14 @@ jobs:
         BBL_STATE_DIR: environments/mitre/
         SYSTEM_DOMAIN: mitre.c2c.cf-app.com
         OPS_FILES: |
-          datadog.yml
-          scale-to-one-az.yml
-          smaller-footprint.yml
-          cf-networking.yml
-          use-system-domain-as-metron-deployment-name.yml
-          custom-apps-domain.yml
-          enable-routing-integrity.yml
-          enable-iptables-logger.yml
+          cf-networking-dev/ci/opsfiles/datadog.yml
+          cf-deployment/operations/scale-to-one-az.yml
+          cf-networking-deployments/smaller-footprint.yml
+          cf-networking-release/ci/pipelines/cf-networking.yml
+          cf-networking-release/manifest-generation/opsfiles/use-system-domain-as-metron-deployment-name.yml
+          cf-networking-release/ci/opsfiles/custom-apps-domain.yml
+          cf-deployment/operations/enable-routing-integrity.yml
+          cf-deployment/operations/experimental/enable-iptables-logger.yml
           add-route-syncer.yml
           use-latest-silk.yml
           use-latest-capi.yml
