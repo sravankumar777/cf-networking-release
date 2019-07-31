@@ -21,7 +21,7 @@ See [deployment docs](https://github.com/cloudfoundry/cf-deployment) for example
 
 ### 2.19.0 Silk-Release
 **New Properties**
-  - An optional parameter has been added to the `vxlan-policy-agent` job to disable c3c network policy enforcement.
+  - An optional parameter has been added to the `vxlan-policy-agent` job to disable c2c network policy enforcement.
     - `disable_container_network_policy`
 
 ### 2.18.0 CF-Networking-Release
